@@ -1,3 +1,2 @@
-const path = require('path');
-
-module.exports = path.dirname(process.mainModule.filename);
+exports.APP_PRODUCT = 'add-product';
+exports.SHOP = 'shop';
