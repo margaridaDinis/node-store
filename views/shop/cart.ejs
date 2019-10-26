@@ -4,6 +4,21 @@
 <body>
   <%- include('../includes/navigation') %>
 	<main>
-		
+		<% if (products.length > 0 ) { %>
+			<ul>
+				<% products.forEach(product => { %>
+					<li>
+						<p><%= product.title %> (<%= product.quantity %>)</p>
+						<form action="/remove-from-cart" method="POST">
+							<input type="hidden" name="productId" value="<%= product.id %>">
+							<button type="submit" class="btn">Delete</button>
+						</form>
+					</li>
+				<% }) %>
+			</ul>
+			<p>Total price: <b><%= totalPrice %></b></p>
+		<% } else { %>
+			<h1>No products in cart!</h1>
+		<% } %>
 	</main>
 <%- include('../includes/end') %>

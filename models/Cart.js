@@ -46,6 +46,14 @@ class Cart {
       }), err => { if (err) console.error(err); });
     });    
   }
+
+  static getProducts(cb) {
+    fs.readFile(FILE, (err, fileContent) => {
+      const cart = !err ? JSON.parse(fileContent) : { products: [], totalPrice: 0 };
+      
+      cb(cart);
+    });
+  }
 };
 
 module.exports = Cart;

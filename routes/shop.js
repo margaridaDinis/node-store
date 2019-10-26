@@ -8,6 +8,7 @@ router.get(`/`, shopController.getIndex);
 
 router.get(`/${PATH.SHOP_CART}`, shopController.getCart);
 router.post(`/${PATH.SHOP_CART}`, shopController.postCart);
+router.post(`/${PATH.SHOP_REMOVE_FROM_CART}`, shopController.postRemoveFromCart);
 
 router.get(`/${PATH.SHOP_ORDERS}`, shopController.getOrders);
 
