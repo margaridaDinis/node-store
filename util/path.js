@@ -1,12 +1,12 @@
 // ADMIN
-exports.ADD_PRODUCT = 'add-product';
-exports.EDIT_PRODUCT = 'edit-product';
-exports.PRODUCTS = 'products';
+exports.ADMIN_ADD_PRODUCT = 'add-product';
+exports.ADMIN_EDIT_PRODUCT = 'edit-product';
+exports.ADMIN_PRODUCTS = 'products';
 
 // SHOP
-exports.SHOP = 'shop';
-exports.CART = 'cart';
-exports.ORDERS = 'orders';
-exports.CHECKOUT = 'checkout';
-exports.PRODUCT_LIST = 'product-list';
-exports.PRODUCT_DETAIL = 'product-detail';
+exports.SHOP_INDEX = 'shop';
+exports.SHOP_CART = 'cart';
+exports.SHOP_ORDERS = 'orders';
+exports.SHOP_CHECKOUT = 'checkout';
+exports.SHOP_PRODUCTS = 'product-list';
+exports.SHOP_PRODUCT = 'product-details';
