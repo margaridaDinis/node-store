@@ -1,5 +1,6 @@
 const PATH = require('../util/path');
-const Product = require('../models/product');
+const Product = require('../models/Product');
+const Cart = require('../models/Cart');
 
 exports.getIndex = (req, res, next) => {
   Product.fetchAll(products => {
@@ -15,6 +16,18 @@ exports.getCart = (req, res, next) => {
     pageTitle: 'Cart',
     path: PATH.SHOP_CART
   });
+};
+
+exports.postCart = (req, res, next) => {
+  const productId = req.body.productId;
+
+  Product.fetchProductById(productId, (product) => {
+    if (!product) return alert('Could not add this product to the cart!');
+
+    Cart.addProduct(productId, product.price);
+  });
+
+  res.redirect(`/${PATH.SHOP_CART}`)
 };
 
 exports.getOrders = (req, res, next) => {
@@ -42,9 +55,9 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.getProductDetail = (req, res, next) => {
-  const productID = req.params.productId;
+  const productId = req.params.productId;
 
-  Product.fetchProductById(productID, (product) => {
+  Product.fetchProductById(productId, (product) => {
     if (!product) return res.redirect('/404');
 
     res.render(`shop/${PATH.SHOP_PRODUCT}`, {
@@ -52,6 +65,5 @@ exports.getProductDetail = (req, res, next) => {
       pageTitle: product.title,
       path: PATH.SHOP_PRODUCTS
     });
-  })
+  });
 };
-
