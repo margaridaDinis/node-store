@@ -1,6 +1,7 @@
 // ADMIN
 exports.ADMIN_ADD_PRODUCT = 'add-product';
 exports.ADMIN_EDIT_PRODUCT = 'edit-product';
+exports.ADMIN_DELETE_PRODUCT = 'delete-product';
 exports.ADMIN_PRODUCTS = 'products';
 
 // SHOP
