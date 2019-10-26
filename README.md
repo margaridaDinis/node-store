@@ -15,5 +15,5 @@ yarn install
 ## Development
 
 ```bash
-yarn star
+yarn start
 ```
