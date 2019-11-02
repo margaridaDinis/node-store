@@ -3,30 +3,29 @@ const Product = require('../models/Product');
 const Cart = require('../models/Cart');
 
 exports.getIndex = (req, res) => {
-  Product.fetchAll(products => {
-    res.render(`shop`, { 
-      pageTitle: 'My Shop',
-      path: PATH.SHOP_INDEX
-    });
+  res.render('shop', {
+    pageTitle: 'My Shop',
+    path: PATH.SHOP_INDEX
   });
 };
 
 exports.getCart = (req, res) => {
   Cart.getProducts(cart => {
-    Product.fetchAll(products => {
-      const cartProducts = cart.products.map(({ id, quantity }) => {
-        const productData = products.find(product => product.id === id);
-        return { ...productData, quantity };
-      });
+    Product.fetchAll()
+      .then(([products]) => {
+        const cartProducts = cart.products.map(({ id, quantity }) => {
+          const productData = products.find(product => product.id === id);
+          return { ...productData, quantity };
+        });
 
-      res.render(`shop/${PATH.SHOP_CART}`, { 
-        pageTitle: 'Cart',
-        products: cartProducts,
-        totalPrice: cart.totalPrice,
-        path: PATH.SHOP_CART
-      });
+        res.render(`shop/${PATH.SHOP_CART}`, { 
+          pageTitle: 'Cart',
+          products: cartProducts,
+          totalPrice: cart.totalPrice,
+          path: PATH.SHOP_CART
+        });
+      }).catch(err => console.log(err));
     });
-  });
 };
 
 exports.postCart = (req, res) => {
@@ -64,25 +63,27 @@ exports.getCheckout = (req, res) => {
 };
 
 exports.getProducts = (req, res) => {
-  Product.fetchAll(products => {
-    res.render(`shop/${PATH.SHOP_PRODUCTS}`, { 
-      products: products,
-      pageTitle: 'All Products',
-      path: PATH.SHOP_PRODUCTS
-    });
-  });
+  Product.fetchAll()
+    .then(([products]) => {
+      res.render(`shop/${PATH.SHOP_PRODUCTS}`, { 
+        products,
+        pageTitle: 'All Products',
+        path: PATH.SHOP_PRODUCTS
+      });
+    }).catch(err => console.log(err));
 };
 
 exports.getProductDetail = (req, res) => {
   const productId = req.params.productId;
 
-  Product.fetchProductById(productId, (product) => {
+  Product.fetchProductById(productId)
+  .then(([product]) => {
     if (!product) return res.redirect('/404');
 
     res.render(`shop/${PATH.SHOP_PRODUCT}`, {
-      product,
+      product: product[0],
       pageTitle: product.title,
       path: PATH.SHOP_PRODUCTS
     });
-  });
+  }).catch(err => console.log(err));
 };

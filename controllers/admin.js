@@ -14,8 +14,9 @@ exports.getAddProduct = (req, res) => {
 exports.postAddProduct = (req, res) => {
   const product =  new Product(req.body);
 
-  product.save();
-  res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
+  product.save().then(() => {
+    res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
+  }).catch(err => console.log(err));
 }; 
 
 exports.getEditProduct = (req, res) => {
@@ -43,13 +44,14 @@ exports.postEditProduct = (req, res) => {
 
 
 exports.getAdminProducts = (req, res) => {
-  Product.fetchAll(products => {
-    res.render(`admin/${PATH.ADMIN_PRODUCTS}`, { 
-      products,
-      pageTitle: 'Products',
-      path: PATH.ADMIN_PRODUCTS
-    });
-  });
+  Product.fetchAll()
+    .then(([products]) => {
+      res.render(`admin/${PATH.ADMIN_PRODUCTS}`, { 
+        products,
+        pageTitle: 'Products',
+        path: PATH.ADMIN_PRODUCTS
+      });
+    }).catch(err => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res) => {
