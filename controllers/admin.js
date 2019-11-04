@@ -1,4 +1,3 @@
-
 const PATH = require('../util/path');
 const Product = require('../models/product');
 
@@ -12,17 +11,19 @@ exports.getAddProduct = (req, res) => {
 };
 
 exports.postAddProduct = (req, res) => {
-  const product =  new Product(req.body);
+  const newProduct = req.body;
 
-  product.save().then(() => {
-    res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
-  }).catch(err => console.log(err));
+  req.user
+  .createProduct(newProduct)
+  .then(() => res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`))
+  .catch(err => console.log(err));
 }; 
 
 exports.getEditProduct = (req, res) => {
   const productId = req.params.productId;
 
-  Product.fetchProductById(productId, product => {
+  req.user.getProducts({ where: { id: productId }})
+  .then(([product]) => {
     if (!product) return res.redirect('/404');
 
     res.render(`admin/${PATH.ADMIN_EDIT_PRODUCT}`, {
@@ -36,16 +37,30 @@ exports.getEditProduct = (req, res) => {
 };
 
 exports.postEditProduct = (req, res) => {
-  const product =  new Product(req.body);
+  const updatedValues = {...req.body};
+  const productId = req.body.id;
+  delete updatedValues.id;
 
-  product.edit();
-  res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
+  Product.findByPk(productId)
+    .then(product => {
+      Object.keys(updatedValues).forEach(key => {
+        product[key] = updatedValues[key];
+      });
+      return product.save();
+    })
+    .then(() => {
+      res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
+    })
+    .catch(err => {
+      console.log(err);
+      res.redirect('/404');
+    });
 }; 
 
-
 exports.getAdminProducts = (req, res) => {
-  Product.fetchAll()
-    .then(([products]) => {
+  req.user
+    .getProducts()
+    .then((products) => {
       res.render(`admin/${PATH.ADMIN_PRODUCTS}`, { 
         products,
         pageTitle: 'Products',
@@ -57,6 +72,15 @@ exports.getAdminProducts = (req, res) => {
 exports.postDeleteProduct = (req, res) => {
   const productId = req.body.productId;
 
-  Product.deleteById(productId);
-  res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
+  Product.findByPk(productId)
+  .then(product => {
+    product.destroy();
+  })
+  .then(() => {
+    res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
+  })
+  .catch(err => {
+    console.log(err);
+    res.redirect('/404');
+  });
 }; 

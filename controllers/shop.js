@@ -11,8 +11,8 @@ exports.getIndex = (req, res) => {
 
 exports.getCart = (req, res) => {
   Cart.getProducts(cart => {
-    Product.fetchAll()
-      .then(([products]) => {
+    Product.findAll()
+      .then(products => {
         const cartProducts = cart.products.map(({ id, quantity }) => {
           const productData = products.find(product => product.id === id);
           return { ...productData, quantity };
@@ -31,7 +31,8 @@ exports.getCart = (req, res) => {
 exports.postCart = (req, res) => {
   const productId = req.body.productId;
 
-  Product.fetchProductById(productId, (product) => {
+  Product.findByPk(productId)
+    .then(product => {
     if (!product) return alert('Could not add this product to the cart!');
 
     Cart.addProduct(productId, product.price);
@@ -63,8 +64,8 @@ exports.getCheckout = (req, res) => {
 };
 
 exports.getProducts = (req, res) => {
-  Product.fetchAll()
-    .then(([products]) => {
+  Product.findAll()
+    .then(products => {
       res.render(`shop/${PATH.SHOP_PRODUCTS}`, { 
         products,
         pageTitle: 'All Products',
@@ -76,14 +77,14 @@ exports.getProducts = (req, res) => {
 exports.getProductDetail = (req, res) => {
   const productId = req.params.productId;
 
-  Product.fetchProductById(productId)
-  .then(([product]) => {
+  Product.findByPk(productId)
+  .then(product => {
     if (!product) return res.redirect('/404');
 
     res.render(`shop/${PATH.SHOP_PRODUCT}`, {
-      product: product[0],
+      product: product,
       pageTitle: product.title,
       path: PATH.SHOP_PRODUCTS
     });
-  }).catch(err => console.log(err));
+  }).catch(err => console.log({err}));
 };
