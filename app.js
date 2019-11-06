@@ -9,8 +9,10 @@ const shopRoutes = require('./routes/shop');
 
 const errorsController = require('./controllers/errors');
 
-const Product = require('./models/Product');
-const User = require('./models/User');
+const Product = require('./models/product');
+const User = require('./models/user');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cartItem');
 
 const app = express();
 
@@ -37,11 +39,17 @@ app.use(shopRoutes);
 app.use(errorsController.get404);
 
 User.hasMany(Product);
+User.hasOne(Cart);
 
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
+
+Cart.belongsTo(User);
 Product.belongsTo(User, { 
   constrains: true,
   onDelete: 'CASCADE' // if we delete the user, it deletes his products
 });
+
 
 sequelize.sync()
   .then(() => {
@@ -53,5 +61,8 @@ sequelize.sync()
     }
     return user;
   })
+  // .then(user => {
+    // user.createCart();
+  // })
   .then(() => app.listen(3000))
   .catch(err => console.log(err));
