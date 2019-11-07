@@ -1,6 +1,6 @@
 const PATH = require('../util/path');
 const Product = require('../models/product');
-const Cart = require('../models/cart');
+const Orders = require('../models/orders');
 
 exports.getIndex = (req, res) => {
   res.render('shop', {
@@ -24,13 +24,13 @@ exports.getCart = (req, res) => {
 
 exports.postCart = (req, res) => {
   const productId = req.body.productId;
-  let Cart;
+  let _cart;
   let quantity = 1;
 
   req.user
     .getCart()
     .then(cart => {
-      Cart = cart;
+      _cart = cart;
       return cart.getProducts({ where: { id: productId } });
     })
     .then(([productInCart]) => {
@@ -43,7 +43,7 @@ exports.postCart = (req, res) => {
 
       return Product.findByPk(productId);
     })
-    .then(product => Cart.addProduct(product, { through: { quantity } }))
+    .then(product => _cart.addProduct(product, { through: { quantity } }))
     .then(() => res.redirect(`/${PATH.SHOP_CART}`))
     .catch(err => console.log({ err }));
 };
@@ -60,10 +60,46 @@ exports.postRemoveFromCart = (req, res) => {
 };
 
 exports.getOrders = (req, res) => {
-  res.render(`shop/${PATH.SHOP_ORDERS}`, {
-    pageTitle: 'Orders',
-    path: PATH.SHOP_ORDERS
-  });
+  req.user
+    .getOrders({ include: ['products'] })
+    .then(orders => 
+      res.render(`shop/${PATH.SHOP_ORDERS}`, {
+        pageTitle: 'Orders',
+        orders,
+        path: PATH.SHOP_ORDERS
+      })
+    ).catch(err => console.log({ err }));
+};
+
+exports.postCreateOrder = (req, res) => {
+  let _cart;
+
+  req.user
+    .getCart()
+    .then(cart => {
+      _cart = cart;
+      return cart.getProducts()
+    })
+    .then(products => {
+      return req.user
+        .createOrder()
+        .then(order => {
+          return order.addProducts(
+            products.map(product => {
+              product.orderItem = { quantity: product.cartItem.quantity };
+              return product;
+            })
+          );
+        })
+        .catch(err => console.log(err));
+    })
+    .then(() => {
+      _cart.setProducts(null);
+    })
+    .then(() => {
+      res.redirect(`${PATH.SHOP_ORDERS}`);
+    })
+    .catch(err => console.log(err));  
 };
 
 exports.getCheckout = (req, res) => {
