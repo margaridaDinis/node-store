@@ -11,19 +11,24 @@ exports.getAddProduct = (req, res) => {
 };
 
 exports.postAddProduct = (req, res) => {
-  const newProduct = req.body;
+  const newProductData = req.body;
+  const product = new Product(newProductData);
 
-  req.user
-  .createProduct(newProduct)
-  .then(() => res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`))
-  .catch(err => console.log(err));
-}; 
+  product
+    .save()
+    .then(() => {
+      res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
 
 exports.getEditProduct = (req, res) => {
   const productId = req.params.productId;
 
-  req.user.getProducts({ where: { id: productId }})
-  .then(([product]) => {
+  Product.fetchById(productId)
+  .then(product => {
     if (!product) return res.redirect('/404');
 
     res.render(`admin/${PATH.ADMIN_EDIT_PRODUCT}`, {
@@ -37,17 +42,11 @@ exports.getEditProduct = (req, res) => {
 };
 
 exports.postEditProduct = (req, res) => {
-  const updatedValues = {...req.body};
-  const productId = req.body.id;
-  delete updatedValues.id;
-
-  Product.findByPk(productId)
-    .then(product => {
-      Object.keys(updatedValues).forEach(key => {
-        product[key] = updatedValues[key];
-      });
-      return product.save();
-    })
+  const updatedValues = req.body;
+  const product = new Product(updatedValues);
+  
+  return product
+    .edit()
     .then(() => {
       res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
     })
@@ -58,8 +57,8 @@ exports.postEditProduct = (req, res) => {
 }; 
 
 exports.getAdminProducts = (req, res) => {
-  req.user
-    .getProducts()
+  Product
+    .fetchAll()
     .then((products) => {
       res.render(`admin/${PATH.ADMIN_PRODUCTS}`, { 
         products,
@@ -72,10 +71,7 @@ exports.getAdminProducts = (req, res) => {
 exports.postDeleteProduct = (req, res) => {
   const productId = req.body.productId;
 
-  Product.findByPk(productId)
-  .then(product => {
-    product.destroy();
-  })
+  Product.deleteById(productId)
   .then(() => {
     res.redirect(`/admin/${PATH.ADMIN_PRODUCTS}`);
   })

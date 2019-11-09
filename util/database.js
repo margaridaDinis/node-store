@@ -1,9 +1,28 @@
-const mysql = require('mysql2');
-const Sequelize = require('sequelize');
+const mongodb = require('mongodb');
+const MongoClient = mongodb.MongoClient;
 
-const sequelize = new Sequelize('node', 'root', '12341234', {
-  dialect: 'mysql',
-  host: 'localhost'
-});
+let _db;
+const _url = 'mongodb+srv://margarida:flowerpower@nodecourse-umt4x.mongodb.net/shop?retryWrites=true&w=majority';
 
-module.exports = sequelize;
+const mongoConnect = callback => {
+  MongoClient.connect(_url, { useUnifiedTopology: true })
+    .then(client => {
+      _db = client.db();
+      callback();
+    })
+    .catch(err => {
+      console.log(err);
+      throw err;
+    });
+};
+
+const getDb = () => {
+  if (_db) {
+    return _db;
+  }
+  throw 'No database found!';
+};
+
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;
+
