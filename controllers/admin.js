@@ -12,7 +12,10 @@ exports.getAddProduct = (req, res) => {
 
 exports.postAddProduct = (req, res) => {
   const newProductData = req.body;
-  const product = new Product(newProductData);
+  const product = new Product({
+    ...newProductData,
+    userId: req.user._id
+  });
 
   product
     .save()
@@ -43,7 +46,10 @@ exports.getEditProduct = (req, res) => {
 
 exports.postEditProduct = (req, res) => {
   const updatedValues = req.body;
-  const product = new Product(updatedValues);
+  const product = new Product({
+    ...updatedValues,
+    userId: req.user._id
+  });
   
   return product
     .edit()
