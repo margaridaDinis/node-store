@@ -39,48 +39,28 @@ exports.postRemoveFromCart = (req, res) => {
     .catch(err => console.log({ err }));
 };
 
-// exports.getOrders = (req, res) => {
-//   req.user
-//     .getOrders({ include: ['products'] })
-//     .then(orders => 
-//       res.render(`shop/${PATH.SHOP_ORDERS}`, {
-//         pageTitle: 'Orders',
-//         orders,
-//         path: PATH.SHOP_ORDERS
-//       })
-//     ).catch(err => console.log({ err }));
-// };
+exports.getOrders = (req, res) => {
+  req.user
+    .getOrders()
+    .then(orders => 
+      res.render(`shop/${PATH.SHOP_ORDERS}`, {
+        pageTitle: 'Orders',
+        orders,
+        path: PATH.SHOP_ORDERS
+      })
+    ).catch(err => console.log({ err }));
+};
 
-// exports.postCreateOrder = (req, res) => {
-//   let _cart;
+exports.postCreateOrder = (req, res) => {
+  let _cart;
 
-//   req.user
-//     .getCart()
-//     .then(cart => {
-//       _cart = cart;
-//       return cart.getProducts()
-//     })
-//     .then(products => {
-//       return req.user
-//         .createOrder()
-//         .then(order => {
-//           return order.addProducts(
-//             products.map(product => {
-//               product.orderItem = { quantity: product.cartItem.quantity };
-//               return product;
-//             })
-//           );
-//         })
-//         .catch(err => console.log(err));
-//     })
-//     .then(() => {
-//       _cart.setProducts(null);
-//     })
-//     .then(() => {
-//       res.redirect(`${PATH.SHOP_ORDERS}`);
-//     })
-//     .catch(err => console.log(err));  
-// };
+  req.user
+    .addOrder()
+    .then(() => {
+      res.redirect(`${PATH.SHOP_ORDERS}`);
+    })
+    .catch(err => console.log(err));  
+};
 
 // exports.getCheckout = (req, res) => {
 //   res.render(`shop/${PATH.SHOP_CHECKOUT}`, {

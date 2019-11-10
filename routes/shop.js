@@ -10,8 +10,8 @@ router.get(`/${PATH.SHOP_CART}`, shopController.getCart);
 router.post(`/${PATH.SHOP_CART}`, shopController.postCart);
 router.post(`/${PATH.SHOP_REMOVE_FROM_CART}`, shopController.postRemoveFromCart);
 
-// router.get(`/${PATH.SHOP_ORDERS}`, shopController.getOrders);
-// router.post(`/${PATH.SHOP_CREATE_ORDER}`, shopController.postCreateOrder);
+router.get(`/${PATH.SHOP_ORDERS}`, shopController.getOrders);
+router.post(`/${PATH.SHOP_CREATE_ORDER}`, shopController.postCreateOrder);
 
 // router.get(`/${PATH.SHOP_CHECKOUT}`, shopController.getCheckout);
 
