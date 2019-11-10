@@ -1,7 +1,7 @@
 const mongoDb = require('mongodb');
 const getDb = require('../util/database').getDb;
 
-const COLLECTION = 'products';
+const COLLECTION = require('../util/collections');
 
 class Product {
   constructor({ id, title, price, description, imageUrl, userId }) {
@@ -17,7 +17,7 @@ class Product {
     const db = getDb();
 
     return db
-      .collection(COLLECTION)
+      .collection(COLLECTION.PRODUCTS)
       .insertOne(this)
       .catch(err => {
         console.log({ err });
@@ -28,7 +28,7 @@ class Product {
     const db = getDb();
 
     return db
-      .collection(COLLECTION)
+      .collection(COLLECTION.PRODUCTS)
       .updateOne({ _id: this._id }, { $set: this })
       .catch(err => {
         console.log({ err });
@@ -39,7 +39,7 @@ class Product {
     const db = getDb();
 
     return db
-      .collection(COLLECTION)
+      .collection(COLLECTION.PRODUCTS)
       .find()
       .toArray()
       .catch(err => {
@@ -52,7 +52,7 @@ class Product {
     const objectId = new mongoDb.ObjectId(id);
 
     return db
-      .collection(COLLECTION)
+      .collection(COLLECTION.PRODUCTS)
       .find({ _id: objectId })
       .next()
       .catch(err => {
@@ -65,7 +65,7 @@ class Product {
     const objectId = new mongoDb.ObjectId(id);
 
     return db
-      .collection(COLLECTION)
+      .collection(COLLECTION.PRODUCTS)
       .deleteOne({ _id: objectId })
       .catch(err => {
         console.log({ err });

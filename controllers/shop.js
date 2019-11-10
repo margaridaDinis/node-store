@@ -9,40 +9,35 @@ exports.getIndex = (req, res) => {
   });
 };
 
-// exports.getCart = (req, res) => {
-//   req.user
-//     .getCart()
-//     .then(cart => cart.getProducts())
-//     .then(products => {
-//       res.render(`shop/${PATH.SHOP_CART}`, {
-//         pageTitle: 'Cart',
-//         products,
-//         path: PATH.SHOP_CART
-//       });
-//     }).catch(err => console.log({ err }));
-// };
+exports.getCart = (req, res) => {
+  req.user
+    .getCart()
+    .then(products => {
+      res.render(`shop/${PATH.SHOP_CART}`, {
+        pageTitle: 'Cart',
+        products,
+        path: PATH.SHOP_CART
+      });
+    }).catch(err => console.log({ err }));
+};
 
 exports.postCart = (req, res) => {
   const productId = req.body.productId;
   
   return Product.fetchById(productId)
-    .then(product => {
-      req.user.addToCart(product);
-    })
+    .then(product => req.user.addToCart(product))
     .then(() => res.redirect(`/${PATH.SHOP_CART}`))
     .catch(err => console.log({ err }));
 };
 
-// exports.postRemoveFromCart = (req, res) => {
-//   const productId = req.body.productId;
+exports.postRemoveFromCart = (req, res) => {
+  const productId = req.body.productId;
 
-//   req.user
-//     .getCart()
-//     .then(cart => cart.getProducts({ where: { id: productId }}))
-//     .then(([product]) => product.cartItem.destroy())
-//     .then(() => res.redirect(`/${PATH.SHOP_CART}`))
-//     .catch(err => console.log({ err }));
-// };
+  req.user
+    .removeFromCart(productId)
+    .then(() => res.redirect(`/${PATH.SHOP_CART}`))
+    .catch(err => console.log({ err }));
+};
 
 // exports.getOrders = (req, res) => {
 //   req.user

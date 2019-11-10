@@ -1,22 +1,42 @@
 const mongoDb = require('mongodb');
 const getDb = require('../util/database').getDb;
 
-const COLLECTION = 'users';
+const COLLECTION = require('../util/collections');
 
 class User {
   constructor({ _id, name, email, cart }) {
     this._id =  new mongoDb.ObjectId(_id);
     this.name = name;
     this.email = email;
-    this.cart = cart;
+    this.cart = cart || {};
   }
 
   save() {
     const db = getDb();
 
     return db
-      .collection(COLLECTION)
+      .collection(COLLECTION.USERS)
       .insertOne(this)
+      .catch(err => {
+        console.log({ err });
+      });
+  }
+
+  getCart() {
+    const db = getDb();
+    const cartItems = this.cart.items || [];
+    const cartProductsIds = cartItems.map(({ productId }) => productId);
+
+    return db
+      .collection(COLLECTION.PRODUCTS)
+      .find({ _id: { $in: cartProductsIds } })
+      .toArray()
+      .then(products => {
+        return products.map(product => {
+          const quantity = cartItems.find(({ productId }) => productId.toString() === product._id.toString()).quantity;
+          return { ...product, quantity };
+        })
+      })
       .catch(err => {
         console.log({ err });
       });
@@ -25,7 +45,7 @@ class User {
   addToCart(product) {
     const db = getDb();
     const id = new mongoDb.ObjectId(product._id);
-    const cartItems = [...this.cart.items];
+    const cartItems = this.cart.items || [];
     const cartProductIdx = cartItems.findIndex(({ productId }) => productId.toString() === id.toString());
     const updatedCart = {};
 
@@ -38,8 +58,17 @@ class User {
     }
 
     return db
-    .collection(COLLECTION)
+    .collection(COLLECTION.USERS)
     .updateOne({ _id: this._id }, { $set: { cart: updatedCart } });
+  }
+
+  removeFromCart(productId) {
+    const db = getDb();
+    const otherItems = this.cart.items.filter(({ productId }) => productId.toString() !== productId.toString());
+
+    return db
+    .collection(COLLECTION.USERS)
+    .updateOne({ _id: this._id }, { $set: { cart: { items: otherItems } } });
   }
 
   static findById(id) {
@@ -47,7 +76,7 @@ class User {
     const objectId = new mongoDb.ObjectId(id);
 
     return db
-      .collection(COLLECTION)
+      .collection(COLLECTION.USERS)
       .findOne({ _id: objectId })
       .catch(err => {
         console.log({ err });
