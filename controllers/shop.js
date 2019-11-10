@@ -22,31 +22,16 @@ exports.getIndex = (req, res) => {
 //     }).catch(err => console.log({ err }));
 // };
 
-// exports.postCart = (req, res) => {
-//   const productId = req.body.productId;
-//   let _cart;
-//   let quantity = 1;
-
-//   req.user
-//     .getCart()
-//     .then(cart => {
-//       _cart = cart;
-//       return cart.getProducts({ where: { id: productId } });
-//     })
-//     .then(([productInCart]) => {
-//       if (productInCart) {
-//         const oldQuantity = productInCart.cartItem.quantity;
-//         quantity = oldQuantity + 1;
-
-//         return productInCart;
-//       }
-
-//       return Product.findByPk(productId);
-//     })
-//     .then(product => _cart.addProduct(product, { through: { quantity } }))
-//     .then(() => res.redirect(`/${PATH.SHOP_CART}`))
-//     .catch(err => console.log({ err }));
-// };
+exports.postCart = (req, res) => {
+  const productId = req.body.productId;
+  
+  return Product.fetchById(productId)
+    .then(product => {
+      req.user.addToCart(product);
+    })
+    .then(() => res.redirect(`/${PATH.SHOP_CART}`))
+    .catch(err => console.log({ err }));
+};
 
 // exports.postRemoveFromCart = (req, res) => {
 //   const productId = req.body.productId;
